@@ -4,50 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nomad Fits</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Navigation -->
-    <header>
-        <nav class="navbar">
-            <h2>Nomad Fits</h2>
+    <nav>
+        <h1>Nomad Fits</h1>
 
-            <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="products.html">Shop</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#products-section">Shop</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
 
-    <!-- Hero -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Wear the Journey.<br>Live the Adventure.</h1>
+        <h3>🛒 Cart: <span id="cart">0</span></h3>
+    </nav>
 
-            <p>
-                Stylish, comfortable and adventure-ready
-                clothing for the modern man.
-            </p>
+    <section class="hero" id="home">
+        <h2>Style For Every Journey</h2>
 
-            <div class="buttons">
-                <button>Shop Now</button>
-                <button>Explore Collections</button>
+        <p>
+            Modern men's clothing designed for travel,
+            adventure, and everyday life.
+        </p>
+
+        <button onclick="document.getElementById('products-section').scrollIntoView()">
+            Shop Now
+        </button>
+    </section>
+
+    <section class="promo">
+        🔥 Summer Sale - Up to 30% Off Selected Items
+    </section>
+
+    <section class="featured">
+        <h2>Featured Collections</h2>
+
+        <div class="featured-cards">
+
+            <div class="feature-card">
+                <h3>Travel Essentials</h3>
+                <p>Perfect outfits for every trip.</p>
             </div>
+
+            <div class="feature-card">
+                <h3>Urban Style</h3>
+                <p>Modern looks for city life.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>New Arrivals</h3>
+                <p>Fresh styles added weekly.</p>
+            </div>
+
         </div>
     </section>
 
-    <!-- Products -->
-    <section class="products">
-        <h2>Trending Products</h2>
+    <section class="search-section" id="products-section">
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Search products..."
+        >
 
-        <div id="product-container" class="product-grid">
-            <!-- Products from API -->
-        </div>
+        <p id="productCount"></p>
     </section>
 
-    <script src="js/app.js"></script>
+    <div id="products"></div>
+
+    <section id="about" class="about">
+        <h2>About Nomad Fits</h2>
+
+        <p>
+            Nomad Fits provides stylish and versatile
+            clothing for men who love travel, comfort,
+            and adventure.
+        </p>
+    </section>
+
+    <section id="contact" class="contact">
+        <h2>Contact Us</h2>
+
+        <p>Email: support@nomadfits.com</p>
+        <p>Phone: (555) 123-4567</p>
+    </section>
+
+    <section class="newsletter">
+        <h2>Subscribe To Our Newsletter</h2>
+
+        <input
+            type="email"
+            id="emailInput"
+            placeholder="Enter your email"
+        >
+
+        <button id="subscribeBtn">
+            Subscribe
+        </button>
+    </section>
+
+    <footer>
+        <p>© 2026 Nomad Fits</p>
+        <p>Built For Modern Explorers</p>
+    </footer>
+
+    <button id="topBtn">↑</button>
+
+    <script src="script.js"></script>
+
 </body>
 </html>
