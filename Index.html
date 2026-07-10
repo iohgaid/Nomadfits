@@ -14,13 +14,16 @@
 
       <nav class="nav-links" id="navLinks">
         <a href="#home">Home</a>
+        <a href="#collections">Trending</a>
         <a href="#shop">Shop</a>
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
       </nav>
 
       <div class="nav-actions">
-        <button class="cart-btn" id="cartBtn">Cart (<span id="cartCount">0</span>)</button>
+        <button class="cart-btn" id="cartBtn">
+          Cart (<span id="cartCount">0</span>)
+        </button>
         <button class="menu-btn" id="menuBtn">☰</button>
       </div>
     </div>
@@ -31,11 +34,12 @@
     <div class="hero-overlay"></div>
     <div class="container hero-content">
       <div class="hero-text">
-        <p class="hero-subtitle">Modern menswear for every destination</p>
+        <p class="hero-subtitle">Modern fashion for every destination</p>
         <h2>Wear the Journey. Live the Adventure.</h2>
         <p>
-          Nomad Fits blends travel-ready comfort with refined style — from city nights
-          to mountain mornings and desert sunsets.
+          Nomad Fits blends travel-ready comfort with refined style — from city
+          nights to mountain mornings. Explore fashion essentials for men,
+          women, shoes, and accessories in one modern shopping experience.
         </p>
         <div class="hero-buttons">
           <a href="#shop" class="btn primary-btn">Shop Now</a>
@@ -50,7 +54,9 @@
     <div class="container">
       <div class="section-heading">
         <h2>Trending Products</h2>
-        <p>Best-selling picks and new arrivals curated for the modern traveler.</p>
+        <p>
+          Best-selling picks and new arrivals curated for style, comfort, and movement.
+        </p>
       </div>
       <div class="trending-grid" id="trendingGrid"></div>
     </div>
@@ -61,15 +67,16 @@
     <div class="container">
       <div class="section-heading">
         <h2>Shop Collection</h2>
-        <p>Browse stylish essentials inspired by movement, comfort, and adventure.</p>
+        <p>
+          Browse our collection of men’s wear, women’s wear, shoes, and accessories.
+        </p>
       </div>
 
       <div class="controls">
         <div class="filters">
           <button class="filter-btn active" data-category="all">All</button>
-          <button class="filter-btn" data-category="shirts">Shirts</button>
-          <button class="filter-btn" data-category="jackets">Jackets</button>
-          <button class="filter-btn" data-category="pants">Pants</button>
+          <button class="filter-btn" data-category="men">Men</button>
+          <button class="filter-btn" data-category="women">Women</button>
           <button class="filter-btn" data-category="shoes">Shoes</button>
           <button class="filter-btn" data-category="accessories">Accessories</button>
         </div>
@@ -118,13 +125,14 @@
           <h3>Brand Philosophy</h3>
           <ul>
             <li>Travel-ready style with everyday comfort</li>
-            <li>Simple, clean menswear with versatile looks</li>
+            <li>Modern fashion for men and women</li>
             <li>Function meets fashion for modern movement</li>
-            <li>Accessible premium aesthetics</li>
+            <li>Clean design with accessible premium aesthetics</li>
           </ul>
         </div>
       </div>
 
+      <!-- TEAM -->
       <div class="team-section">
         <h3>Meet the Team</h3>
         <div class="team-grid">
@@ -132,28 +140,40 @@
             <img src="https://plus.gabischool.com/assets/uploads/students/69eefaf810683.JPG" alt="Imran" />
             <h4>Imran</h4>
             <p>Project Lead / Frontend Integration</p>
-            <span>Hero section, featured collection, sorting, product detail flow, project integration</span>
+            <span>
+              Hero section, product rendering flow, API integration, sorting logic,
+              and combining the full project into one final version.
+            </span>
           </div>
 
           <div class="team-card">
             <img src="https://plus.gabischool.com/assets/uploads/students/student_6a467244182e66.29299757.jpg" alt="Umayma" />
             <h4>Umayma</h4>
-            <p>UI & Filtering</p>
-            <span>Category filters, product count, shop layout, responsive product listing UI</span>
+            <p>UI & Product Filtering</p>
+            <span>
+              Category filters, product count, shop layout, responsive product cards,
+              and improved browsing experience for users.
+            </span>
           </div>
 
           <div class="team-card">
             <img src="https://plus.gabischool.com/assets/uploads/students/69f5665e05ee9.jpeg" alt="Farhiya" />
             <h4>Farhiya</h4>
-            <p>Cart & User Flow</p>
-            <span>Cart sidebar, add/remove items, quantity controls, total calculation, localStorage cart</span>
+            <p>Cart & Shopping Flow</p>
+            <span>
+              Cart sidebar, add/remove items, quantity controls, total calculation,
+              checkout flow, and localStorage cart persistence.
+            </span>
           </div>
 
           <div class="team-card">
             <img src="https://plus.gabischool.com/assets/uploads/students/698393929f956.jpeg" alt="Maryama" />
             <h4>Maryama</h4>
-            <p>Modal, Testing & Validation</p>
-            <span>Product detail modal, reviews section, form validation, testing product interactions</span>
+            <p>Modal, Validation & Testing</p>
+            <span>
+              Product detail modal, reviews section, size selection, contact form validation,
+              and testing the final user interactions.
+            </span>
           </div>
         </div>
       </div>
@@ -215,7 +235,7 @@
 
     <div class="cart-footer">
       <h4>Total: $<span id="cartTotal">0.00</span></h4>
-      <button class="btn primary-btn checkout-btn">Checkout</button>
+      <button class="btn primary-btn checkout-btn" id="checkoutBtn">Checkout</button>
     </div>
   </aside>
 

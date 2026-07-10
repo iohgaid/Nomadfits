@@ -1,8 +1,12 @@
 const API_URL = "https://api.escuelajs.co/api/v1/products";
 
+/* =========================
+   DOM ELEMENTS
+========================= */
 const productsGrid = document.getElementById("productsGrid");
 const trendingGrid = document.getElementById("trendingGrid");
 const productCount = document.getElementById("productCount");
+
 const filterButtons = document.querySelectorAll(".filter-btn");
 const sortSelect = document.getElementById("sortSelect");
 
@@ -12,6 +16,7 @@ const cartSidebar = document.getElementById("cartSidebar");
 const cartItems = document.getElementById("cartItems");
 const cartCount = document.getElementById("cartCount");
 const cartTotal = document.getElementById("cartTotal");
+const checkoutBtn = document.getElementById("checkoutBtn");
 
 const overlay = document.getElementById("overlay");
 const productModal = document.getElementById("productModal");
@@ -32,18 +37,32 @@ const emailError = document.getElementById("emailError");
 const messageError = document.getElementById("messageError");
 const formSuccess = document.getElementById("formSuccess");
 
+/* =========================
+   STATE
+========================= */
 let allProducts = [];
 let filteredProducts = [];
 let selectedCategory = "all";
 let selectedSort = "default";
 let cart = JSON.parse(localStorage.getItem("nomadFitsCart")) || [];
 
-/* -----------------------------
-   Helpers / Mock UI Data
------------------------------- */
+/* =========================
+   HELPERS
+========================= */
+function capitalize(text) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function showToast(message) {
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2200);
+}
 
 function getRating(product) {
-  // Fake rating derived from id so the UI stays consistent
   return ((product.id % 5) + 1).toFixed(1);
 }
 
@@ -55,22 +74,22 @@ function getOldPrice(product) {
   return (product.price * 1.25).toFixed(2);
 }
 
-function getMaterialInfo(mappedCategory) {
-  const map = {
-    shirts: "Soft cotton blend, breathable weave, travel-friendly wrinkle resistance.",
-    jackets: "Lightweight outer shell with durable stitching and layering comfort.",
-    pants: "Flexible stretch fabric with all-day comfort and a clean modern fit.",
-    shoes: "Cushioned insole, durable outsole, and lightweight city-to-travel comfort.",
-    accessories: "Compact travel-friendly design with a focus on everyday practicality."
-  };
-  return map[mappedCategory] || "Premium travel-ready material designed for style and comfort.";
-}
-
 function getSustainabilityInfo(product) {
   if (product.id % 2 === 0) {
-    return "Eco-friendly option: made with lower-impact materials and a more sustainable production focus.";
+    return "Made with lower-impact materials and designed for longer wear.";
   }
-  return "Built with durability and long-term wear in mind to reduce fast replacement cycles.";
+  return "Designed for durability, repeat wear, and everyday comfort.";
+}
+
+function getMaterialInfo(category) {
+  const materials = {
+    men: "Premium cotton blend with breathable fabric and travel-ready comfort.",
+    women: "Soft lightweight fabric with comfort, flexibility, and a clean modern fit.",
+    shoes: "Durable upper material, cushioned sole, and lightweight support.",
+    accessories: "Practical travel-friendly design with durable everyday materials."
+  };
+
+  return materials[category] || "Comfortable, stylish, and built for daily wear.";
 }
 
 function getFakeReviews(product) {
@@ -78,49 +97,88 @@ function getFakeReviews(product) {
     {
       name: "Alex M.",
       rating: "★★★★★",
-      text: `Really impressed with the fit and quality of ${product.title}. Great for travel and daily wear.`
+      text: `${product.title} feels stylish, comfortable, and easy to wear every day.`
     },
     {
       name: "Jordan T.",
       rating: "★★★★☆",
-      text: "Comfortable, stylish, and easy to pair with other pieces. Shipping was smooth too."
+      text: "The quality is solid and the fit feels great. Good value for the price."
     },
     {
       name: "Sam R.",
       rating: "★★★★★",
-      text: "Looks premium and feels practical. Definitely one of my favorite pieces from the collection."
+      text: "One of my favorite items from the collection. Looks clean and feels premium."
     }
   ];
 }
 
+/* =========================
+   CATEGORY MAPPING
+========================= */
 function getMappedCategory(product) {
   const title = (product.title || "").toLowerCase();
   const desc = (product.description || "").toLowerCase();
   const originalCategory = (product.category?.name || "").toLowerCase();
   const text = `${title} ${desc} ${originalCategory}`;
 
-  if (text.includes("shoe") || text.includes("sneaker") || text.includes("boot")) {
+  // SHOES
+  if (
+    text.includes("shoe") ||
+    text.includes("sneaker") ||
+    text.includes("boot") ||
+    text.includes("loafer") ||
+    text.includes("heel")
+  ) {
     return "shoes";
   }
-  if (text.includes("bag") || text.includes("watch") || text.includes("cap") || text.includes("belt") || text.includes("accessor")) {
+
+  // ACCESSORIES
+  if (
+    text.includes("bag") ||
+    text.includes("watch") ||
+    text.includes("belt") ||
+    text.includes("cap") ||
+    text.includes("hat") ||
+    text.includes("wallet") ||
+    text.includes("accessor") ||
+    text.includes("backpack")
+  ) {
     return "accessories";
   }
-  if (text.includes("jacket") || text.includes("coat") || text.includes("hoodie")) {
-    return "jackets";
-  }
-  if (text.includes("pant") || text.includes("jean") || text.includes("trouser")) {
-    return "pants";
-  }
-  if (text.includes("shirt") || text.includes("tee") || text.includes("t-shirt") || text.includes("polo")) {
-    return "shirts";
+
+  // WOMEN
+  if (
+    text.includes("dress") ||
+    text.includes("skirt") ||
+    text.includes("blouse") ||
+    text.includes("women") ||
+    text.includes("female") ||
+    text.includes("handbag")
+  ) {
+    return "women";
   }
 
-  // fallback mapping
+  // MEN
+  if (
+    text.includes("shirt") ||
+    text.includes("jacket") ||
+    text.includes("hoodie") ||
+    text.includes("polo") ||
+    text.includes("men") ||
+    text.includes("male") ||
+    text.includes("pant") ||
+    text.includes("jean") ||
+    text.includes("trouser")
+  ) {
+    return "men";
+  }
+
+  // FALLBACK FROM API CATEGORY
   if (originalCategory.includes("shoe")) return "shoes";
-  if (originalCategory.includes("clothes")) return "shirts";
   if (originalCategory.includes("misc")) return "accessories";
+  if (originalCategory.includes("clothes")) return "men";
 
-  return "shirts";
+  return "men";
 }
 
 function normalizeProduct(product) {
@@ -129,9 +187,10 @@ function normalizeProduct(product) {
     title: product.title,
     price: Number(product.price) || 0,
     description: product.description || "No description available.",
-    image: Array.isArray(product.images) && product.images.length
-      ? product.images[0]
-      : "https://via.placeholder.com/400x500?text=Nomad+Fits",
+    image:
+      Array.isArray(product.images) && product.images.length
+        ? product.images[0]
+        : "https://via.placeholder.com/400x500?text=Nomad+Fits",
     category: getMappedCategory(product),
     originalCategory: product.category?.name || "Unknown",
     rating: getRating(product),
@@ -141,18 +200,16 @@ function normalizeProduct(product) {
   };
 }
 
-/* -----------------------------
-   Fetch API Products
------------------------------- */
-
+/* =========================
+   FETCH PRODUCTS
+========================= */
 async function fetchProducts() {
   try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
+    const response = await fetch(API_URL);
+    const data = await response.json();
 
-    // Keep mostly fashion-friendly products
     const fashionProducts = data
-      .filter(item => {
+      .filter((item) => {
         const cat = item.category?.name?.toLowerCase() || "";
         return (
           cat.includes("clothes") ||
@@ -160,7 +217,7 @@ async function fetchProducts() {
           cat.includes("misc")
         );
       })
-      .slice(0, 24)
+      .slice(0, 28)
       .map(normalizeProduct);
 
     allProducts = fashionProducts;
@@ -170,57 +227,122 @@ async function fetchProducts() {
     renderProducts();
   } catch (error) {
     console.error("Error fetching products:", error);
-    productsGrid.innerHTML = `<p>Failed to load products. Please try again later.</p>`;
-    trendingGrid.innerHTML = `<p>Trending products unavailable right now.</p>`;
+
+    allProducts = [
+      {
+        id: 1001,
+        title: "Men's Travel Shirt",
+        price: 45,
+        description: "Breathable shirt for daily wear and travel comfort.",
+        image: "https://via.placeholder.com/400x500?text=Mens+Shirt",
+        category: "men",
+        originalCategory: "Clothes",
+        rating: "4.5",
+        isSale: true,
+        isNew: true,
+        isBestSeller: false
+      },
+      {
+        id: 1002,
+        title: "Women's Urban Dress",
+        price: 58,
+        description: "A modern lightweight dress with comfort and style.",
+        image: "https://via.placeholder.com/400x500?text=Womens+Dress",
+        category: "women",
+        originalCategory: "Clothes",
+        rating: "4.7",
+        isSale: false,
+        isNew: true,
+        isBestSeller: true
+      },
+      {
+        id: 1003,
+        title: "Leather Sneakers",
+        price: 92,
+        description: "Modern sneakers for everyday movement and travel.",
+        image: "https://via.placeholder.com/400x500?text=Sneakers",
+        category: "shoes",
+        originalCategory: "Shoes",
+        rating: "4.8",
+        isSale: true,
+        isNew: false,
+        isBestSeller: true
+      },
+      {
+        id: 1004,
+        title: "Travel Backpack",
+        price: 40,
+        description: "Compact and stylish backpack for daily essentials.",
+        image: "https://via.placeholder.com/400x500?text=Backpack",
+        category: "accessories",
+        originalCategory: "Accessories",
+        rating: "4.4",
+        isSale: false,
+        isNew: false,
+        isBestSeller: false
+      }
+    ];
+
+    filteredProducts = [...allProducts];
+    renderTrendingProducts();
+    renderProducts();
+    showToast("Live API unavailable. Showing demo products.");
   }
 }
 
-/* -----------------------------
-   Trending
------------------------------- */
-
+/* =========================
+   RENDER TRENDING
+========================= */
 function renderTrendingProducts() {
   const trending = allProducts
-    .filter(product => product.isBestSeller || product.isNew)
+    .filter((product) => product.isBestSeller || product.isNew)
     .slice(0, 4);
 
-  trendingGrid.innerHTML = trending.map(product => `
-    <div class="product-card">
-      ${product.isSale ? `<span class="sale-badge">SALE</span>` : ""}
-      <div class="product-image-wrap">
-        <img src="${product.image}" alt="${product.title}" class="product-image" />
-        <span class="quick-preview">Quick Preview</span>
-      </div>
-      <div class="product-info">
-        <div class="product-title-row">
+  trendingGrid.innerHTML = trending
+    .map(
+      (product) => `
+      <div class="product-card">
+        ${product.isSale ? `<span class="sale-badge">SALE</span>` : ""}
+        <div class="product-image-wrap">
+          <img src="${product.image}" alt="${product.title}" class="product-image" />
+          <span class="quick-preview">Quick Preview</span>
+        </div>
+        <div class="product-info">
           <h3>${product.title}</h3>
-        </div>
-        <p class="product-meta">${product.category}</p>
-        <div class="product-price">
-          $${product.price.toFixed(2)}
-          ${product.isSale ? `<span class="old-price">$${getOldPrice(product)}</span>` : ""}
-        </div>
-        <div class="rating">${"★".repeat(Math.round(product.rating))} <span>(${product.rating})</span></div>
-        <div class="product-actions">
-          <button class="btn primary-btn add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
-          <button class="btn secondary-btn view-details-btn" data-id="${product.id}">View Details</button>
+          <p class="product-meta">${capitalize(product.category)}</p>
+          <div class="product-price">
+            $${product.price.toFixed(2)}
+            ${product.isSale ? `<span class="old-price">$${getOldPrice(product)}</span>` : ""}
+          </div>
+          <div class="rating">
+            ${"★".repeat(Math.round(product.rating))}
+            <span>(${product.rating})</span>
+          </div>
+          <div class="product-actions">
+            <button class="btn primary-btn add-to-cart-btn" data-id="${product.id}">
+              Add to Cart
+            </button>
+            <button class="btn secondary-btn view-details-btn" data-id="${product.id}">
+              View Details
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  `).join("");
+    `
+    )
+    .join("");
 
   attachProductButtons();
 }
 
-/* -----------------------------
-   Filters + Sorting
------------------------------- */
-
+/* =========================
+   FILTER + SORT
+========================= */
 function applyFiltersAndSort() {
   let results = [...allProducts];
 
   if (selectedCategory !== "all") {
-    results = results.filter(product => product.category === selectedCategory);
+    results = results.filter((product) => product.category === selectedCategory);
   }
 
   if (selectedSort === "price-low") {
@@ -237,9 +359,9 @@ function applyFiltersAndSort() {
   renderProducts();
 }
 
-filterButtons.forEach(button => {
+filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    filterButtons.forEach(btn => btn.classList.remove("active"));
+    filterButtons.forEach((btn) => btn.classList.remove("active"));
     button.classList.add("active");
     selectedCategory = button.dataset.category;
     applyFiltersAndSort();
@@ -251,10 +373,9 @@ sortSelect.addEventListener("change", (e) => {
   applyFiltersAndSort();
 });
 
-/* -----------------------------
-   Render Shop Products
------------------------------- */
-
+/* =========================
+   RENDER PRODUCTS
+========================= */
 function renderProducts() {
   productCount.textContent = filteredProducts.length;
 
@@ -263,66 +384,60 @@ function renderProducts() {
     return;
   }
 
-  productsGrid.innerHTML = filteredProducts.map(product => `
-    <div class="product-card">
-      ${product.isSale ? `<span class="sale-badge">SALE</span>` : ""}
-      <div class="product-image-wrap">
-        <img src="${product.image}" alt="${product.title}" class="product-image" />
-        <span class="quick-preview">Quick Preview</span>
-      </div>
-
-      <div class="product-info">
-        <div class="product-title-row">
+  productsGrid.innerHTML = filteredProducts
+    .map(
+      (product) => `
+      <div class="product-card">
+        ${product.isSale ? `<span class="sale-badge">SALE</span>` : ""}
+        <div class="product-image-wrap">
+          <img src="${product.image}" alt="${product.title}" class="product-image" />
+          <span class="quick-preview">Quick Preview</span>
+        </div>
+        <div class="product-info">
           <h3>${product.title}</h3>
-        </div>
-
-        <p class="product-meta">${product.category}</p>
-
-        <div class="product-price">
-          $${product.price.toFixed(2)}
-          ${product.isSale ? `<span class="old-price">$${getOldPrice(product)}</span>` : ""}
-        </div>
-
-        <div class="rating">
-          ${"★".repeat(Math.round(product.rating))} <span>(${product.rating})</span>
-        </div>
-
-        <div class="product-actions">
-          <button class="btn primary-btn add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
-          <button class="btn secondary-btn view-details-btn" data-id="${product.id}">View Details</button>
+          <p class="product-meta">${capitalize(product.category)}</p>
+          <div class="product-price">
+            $${product.price.toFixed(2)}
+            ${product.isSale ? `<span class="old-price">$${getOldPrice(product)}</span>` : ""}
+          </div>
+          <div class="rating">
+            ${"★".repeat(Math.round(product.rating))}
+            <span>(${product.rating})</span>
+          </div>
+          <div class="product-actions">
+            <button class="btn primary-btn add-to-cart-btn" data-id="${product.id}">
+              Add to Cart
+            </button>
+            <button class="btn secondary-btn view-details-btn" data-id="${product.id}">
+              View Details
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  `).join("");
+    `
+    )
+    .join("");
 
   attachProductButtons();
 }
 
 function attachProductButtons() {
-  const addButtons = document.querySelectorAll(".add-to-cart-btn");
-  const detailButtons = document.querySelectorAll(".view-details-btn");
-
-  addButtons.forEach(button => {
-    button.addEventListener("click", () => {
-      const id = Number(button.dataset.id);
-      addToCart(id);
-    });
+  document.querySelectorAll(".add-to-cart-btn").forEach((button) => {
+    button.addEventListener("click", () => addToCart(Number(button.dataset.id)));
   });
 
-  detailButtons.forEach(button => {
-    button.addEventListener("click", () => {
-      const id = Number(button.dataset.id);
-      openProductModal(id);
-    });
+  document.querySelectorAll(".view-details-btn").forEach((button) => {
+    button.addEventListener("click", () =>
+      openProductModal(Number(button.dataset.id))
+    );
   });
 }
 
-/* -----------------------------
-   Product Modal
------------------------------- */
-
+/* =========================
+   PRODUCT MODAL
+========================= */
 function openProductModal(productId) {
-  const product = allProducts.find(item => item.id === productId);
+  const product = allProducts.find((item) => item.id === productId);
   if (!product) return;
 
   const reviews = getFakeReviews(product);
@@ -334,10 +449,11 @@ function openProductModal(productId) {
 
     <div class="modal-info">
       <h2>${product.title}</h2>
-      <p class="modal-category">${product.category} • ${product.originalCategory}</p>
+      <p class="modal-category">${capitalize(product.category)} • ${product.originalCategory}</p>
 
       <div class="rating">
-        ${"★".repeat(Math.round(product.rating))} <span>(${product.rating})</span>
+        ${"★".repeat(Math.round(product.rating))}
+        <span>(${product.rating})</span>
       </div>
 
       <div class="product-price">
@@ -354,8 +470,7 @@ function openProductModal(productId) {
       </div>
 
       <div class="modal-block">
-        <h4>Size Selector & Fit Guide</h4>
-        <p>Select a size that matches your regular fit. Slim silhouettes may feel slightly fitted.</p>
+        <h4>Size Selection</h4>
         <div class="size-options">
           <button class="size-btn active">S</button>
           <button class="size-btn">M</button>
@@ -366,13 +481,17 @@ function openProductModal(productId) {
 
       <div class="modal-block">
         <h4>Customer Reviews</h4>
-        ${reviews.map(review => `
-          <div class="review-card">
-            <strong>${review.name}</strong>
-            <span>${review.rating}</span>
-            <p>${review.text}</p>
-          </div>
-        `).join("")}
+        ${reviews
+          .map(
+            (review) => `
+            <div class="review-card">
+              <strong>${review.name}</strong>
+              <span>${review.rating}</span>
+              <p>${review.text}</p>
+            </div>
+          `
+          )
+          .join("")}
       </div>
 
       <button class="btn primary-btn" id="modalAddToCartBtn">Add to Cart</button>
@@ -383,38 +502,40 @@ function openProductModal(productId) {
   productModal.classList.remove("hidden");
   overlay.classList.remove("hidden");
 
-  const sizeButtons = document.querySelectorAll(".size-btn");
-  sizeButtons.forEach(btn => {
+  document.querySelectorAll(".size-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
-      sizeButtons.forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".size-btn").forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
     });
   });
 
-  const modalAddToCartBtn = document.getElementById("modalAddToCartBtn");
-  const modalConfirmText = document.getElementById("modalConfirmText");
-
-  modalAddToCartBtn.addEventListener("click", () => {
+  document.getElementById("modalAddToCartBtn").addEventListener("click", () => {
     addToCart(product.id);
-    modalConfirmText.textContent = "Added to cart successfully!";
+    document.getElementById("modalConfirmText").textContent =
+      "Added to cart successfully!";
   });
 }
 
-function closeModal() {
+function closeAllPanels() {
+  cartSidebar.classList.remove("open");
   productModal.classList.add("hidden");
+  overlay.classList.add("hidden");
 }
 
-/* -----------------------------
-   Cart
------------------------------- */
+/* =========================
+   CART
+========================= */
+function saveCart() {
+  localStorage.setItem("nomadFitsCart", JSON.stringify(cart));
+}
 
 function addToCart(productId) {
-  const existingItem = cart.find(item => item.id === productId);
+  const existingItem = cart.find((item) => item.id === productId);
 
   if (existingItem) {
     existingItem.quantity += 1;
   } else {
-    const product = allProducts.find(item => item.id === productId);
+    const product = allProducts.find((item) => item.id === productId);
     if (!product) return;
 
     cart.push({
@@ -432,7 +553,7 @@ function addToCart(productId) {
 }
 
 function increaseQuantity(productId) {
-  const item = cart.find(item => item.id === productId);
+  const item = cart.find((item) => item.id === productId);
   if (!item) return;
   item.quantity += 1;
   saveCart();
@@ -440,12 +561,13 @@ function increaseQuantity(productId) {
 }
 
 function decreaseQuantity(productId) {
-  const item = cart.find(item => item.id === productId);
+  const item = cart.find((item) => item.id === productId);
   if (!item) return;
 
   item.quantity -= 1;
+
   if (item.quantity <= 0) {
-    cart = cart.filter(item => item.id !== productId);
+    cart = cart.filter((item) => item.id !== productId);
   }
 
   saveCart();
@@ -453,120 +575,107 @@ function decreaseQuantity(productId) {
 }
 
 function removeFromCart(productId) {
-  cart = cart.filter(item => item.id !== productId);
+  cart = cart.filter((item) => item.id !== productId);
   saveCart();
   renderCart();
-}
-
-function saveCart() {
-  localStorage.setItem("nomadFitsCart", JSON.stringify(cart));
 }
 
 function renderCart() {
   if (!cart.length) {
     cartItems.innerHTML = `<p>Your cart is empty.</p>`;
   } else {
-    cartItems.innerHTML = cart.map(item => `
-      <div class="cart-item">
-        <img src="${item.image}" alt="${item.title}" />
-        <div>
-          <h4>${item.title}</h4>
-          <p>$${item.price.toFixed(2)} × ${item.quantity}</p>
-          <div class="cart-item-actions">
-            <button class="qty-btn increase-btn" data-id="${item.id}">+</button>
-            <button class="qty-btn decrease-btn" data-id="${item.id}">-</button>
-            <button class="remove-btn remove-btn-cart" data-id="${item.id}">Remove</button>
+    cartItems.innerHTML = cart
+      .map(
+        (item) => `
+        <div class="cart-item">
+          <img src="${item.image}" alt="${item.title}" />
+          <div>
+            <h4>${item.title}</h4>
+            <p>$${item.price.toFixed(2)} × ${item.quantity}</p>
+            <div class="cart-item-actions">
+              <button class="qty-btn increase-btn" data-id="${item.id}">+</button>
+              <button class="qty-btn decrease-btn" data-id="${item.id}">-</button>
+              <button class="remove-btn remove-btn-cart" data-id="${item.id}">Remove</button>
+            </div>
           </div>
         </div>
-      </div>
-    `).join("");
+      `
+      )
+      .join("");
   }
 
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+  cartTotal.textContent = cart
+    .reduce((sum, item) => sum + item.price * item.quantity, 0)
+    .toFixed(2);
 
-  cartCount.textContent = totalItems;
-  cartTotal.textContent = totalPrice.toFixed(2);
-
-  attachCartButtons();
-}
-
-function attachCartButtons() {
-  document.querySelectorAll(".increase-btn").forEach(button => {
-    button.addEventListener("click", () => {
-      increaseQuantity(Number(button.dataset.id));
-    });
+  document.querySelectorAll(".increase-btn").forEach((button) => {
+    button.addEventListener("click", () =>
+      increaseQuantity(Number(button.dataset.id))
+    );
   });
 
-  document.querySelectorAll(".decrease-btn").forEach(button => {
-    button.addEventListener("click", () => {
-      decreaseQuantity(Number(button.dataset.id));
-    });
+  document.querySelectorAll(".decrease-btn").forEach((button) => {
+    button.addEventListener("click", () =>
+      decreaseQuantity(Number(button.dataset.id))
+    );
   });
 
-  document.querySelectorAll(".remove-btn-cart").forEach(button => {
-    button.addEventListener("click", () => {
-      removeFromCart(Number(button.dataset.id));
-    });
+  document.querySelectorAll(".remove-btn-cart").forEach((button) => {
+    button.addEventListener("click", () =>
+      removeFromCart(Number(button.dataset.id))
+    );
   });
 }
 
-/* -----------------------------
-   Cart / Modal / Overlay UI
------------------------------- */
-
-function openCart() {
+/* =========================
+   UI EVENTS
+========================= */
+cartBtn.addEventListener("click", () => {
   cartSidebar.classList.add("open");
   overlay.classList.remove("hidden");
-}
+});
 
-function closeCart() {
+closeCartBtn.addEventListener("click", () => {
   cartSidebar.classList.remove("open");
-  if (!productModal.classList.contains("hidden")) return;
-  overlay.classList.add("hidden");
-}
+  if (productModal.classList.contains("hidden")) {
+    overlay.classList.add("hidden");
+  }
+});
 
-function closeAllPanels() {
-  cartSidebar.classList.remove("open");
-  productModal.classList.add("hidden");
-  overlay.classList.add("hidden");
-}
-
-cartBtn.addEventListener("click", openCart);
-closeCartBtn.addEventListener("click", closeCart);
 closeModalBtn.addEventListener("click", closeAllPanels);
 overlay.addEventListener("click", closeAllPanels);
 
-/* -----------------------------
-   Toast
------------------------------- */
+checkoutBtn.addEventListener("click", () => {
+  if (!cart.length) {
+    showToast("Your cart is empty.");
+    return;
+  }
 
-function showToast(message) {
-  toast.textContent = message;
-  toast.classList.add("show");
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 2200);
-}
-
-/* -----------------------------
-   Mobile Nav
------------------------------- */
+  showToast("Checkout demo complete. Thank you for shopping with Nomad Fits!");
+  cart = [];
+  saveCart();
+  renderCart();
+  closeAllPanels();
+});
 
 menuBtn.addEventListener("click", () => {
   navLinks.classList.toggle("show");
 });
 
-/* -----------------------------
-   Contact Form Validation
------------------------------- */
+document.querySelectorAll(".nav-links a").forEach((link) => {
+  link.addEventListener("click", () => {
+    navLinks.classList.remove("show");
+  });
+});
 
+/* =========================
+   CONTACT FORM VALIDATION
+========================= */
 contactForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
   let isValid = true;
-
   nameError.textContent = "";
   emailError.textContent = "";
   messageError.textContent = "";
@@ -597,9 +706,8 @@ contactForm.addEventListener("submit", (e) => {
   }
 });
 
-/* -----------------------------
-   Init
------------------------------- */
-
+/* =========================
+   INIT
+========================= */
 renderCart();
 fetchProducts();
