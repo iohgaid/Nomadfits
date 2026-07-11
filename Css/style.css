@@ -49,7 +49,7 @@ ul {
 }
 
 .section-heading p {
-  color: #666;
+  color:white;
   max-width: 700px;
 }
 
@@ -101,6 +101,28 @@ ul {
   justify-content: space-between;
   padding: 18px 0;
   gap: 20px;
+}
+.dark-mode {
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+.dark-mode nav {
+  background:#c19a6b;
+}
+
+.dark-mode .product-card {
+  background: #1e293b;
+  color: white;
+}
+
+.dark-mode .hero {
+  filter: brightness(0.8);
+}
+
+.dark-mode button {
+  background: #c19a6b;
+  color: white;
 }
 
 .logo {
