@@ -1,5 +1,3 @@
-const API_URL = "https://api.escuelajs.co/api/v1/products";
-
 /* =========================
    DOM ELEMENTS
 ========================= */
@@ -9,6 +7,7 @@ const productCount = document.getElementById("productCount");
 
 const filterButtons = document.querySelectorAll(".filter-btn");
 const sortSelect = document.getElementById("sortSelect");
+const searchInput = document.getElementById("searchInput");
 
 const cartBtn = document.getElementById("cartBtn");
 const closeCartBtn = document.getElementById("closeCartBtn");
@@ -44,13 +43,34 @@ let allProducts = [];
 let filteredProducts = [];
 let selectedCategory = "all";
 let selectedSort = "default";
+let searchTerm = "";
 let cart = JSON.parse(localStorage.getItem("nomadFitsCart")) || [];
+
+/* =========================
+   CATEGORY LABELS
+   (friendly display names for each product category)
+========================= */
+const CATEGORY_LABELS = {
+  tshirts: "T-Shirts",
+  hoodies: "Hoodies",
+  jackets: "Jackets",
+  jeans: "Jeans",
+  dresses: "Dresses",
+  accessories: "Accessories",
+  shoes: "Shoes"
+};
+
+const FALLBACK_IMAGE = "https://via.placeholder.com/500x600?text=Nomad+Fits";
 
 /* =========================
    HELPERS
 ========================= */
 function capitalize(text) {
   return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function categoryLabel(category) {
+  return CATEGORY_LABELS[category] || capitalize(category);
 }
 
 function showToast(message) {
@@ -83,10 +103,13 @@ function getSustainabilityInfo(product) {
 
 function getMaterialInfo(category) {
   const materials = {
-    men: "Premium cotton blend with breathable fabric and travel-ready comfort.",
-    women: "Soft lightweight fabric with comfort, flexibility, and a clean modern fit.",
-    shoes: "Durable upper material, cushioned sole, and lightweight support.",
-    accessories: "Practical travel-friendly design with durable everyday materials."
+    tshirts: "100% breathable combed cotton, pre-shrunk for a lasting everyday fit.",
+    hoodies: "Brushed cotton-fleece blend that stays soft, warm, and travel-ready.",
+    jackets: "Weather-resistant shell with a comfortable inner lining for all-season wear.",
+    jeans: "Premium stretch denim built for movement, durability, and a clean silhouette.",
+    dresses: "Soft lightweight fabric with comfort, flexibility, and a clean modern drape.",
+    accessories: "Practical, travel-friendly design crafted from durable everyday materials.",
+    shoes: "Durable upper material, cushioned sole, and lightweight all-day support."
   };
 
   return materials[category] || "Comfortable, stylish, and built for daily wear.";
@@ -113,181 +136,88 @@ function getFakeReviews(product) {
 }
 
 /* =========================
-   CATEGORY MAPPING
+   PRODUCT CATALOG
+   Curated clothing-focused catalog (weighted toward
+   T-Shirts, Hoodies, Jackets, Jeans, Dresses & Accessories,
+   with only a couple of Shoes items).
 ========================= */
-function getMappedCategory(product) {
-  const title = (product.title || "").toLowerCase();
-  const desc = (product.description || "").toLowerCase();
-  const originalCategory = (product.category?.name || "").toLowerCase();
-  const text = `${title} ${desc} ${originalCategory}`;
+const RAW_PRODUCTS = [
+  // T-SHIRTS
+  { id: 1, title: "Men's Classic Crew Tee", price: 28, category: "tshirts", desc: "A breathable everyday tee cut from soft combed cotton for all-day comfort.", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=700&q=80" },
+  { id: 2, title: "Women's Relaxed Fit Tee", price: 26, category: "tshirts", desc: "A relaxed-fit tee with a soft drape, perfect for layering or wearing solo.", image: "https://images.unsplash.com/photo-1554568218-0f1715e72254?auto=format&fit=crop&w=700&q=80" },
+  { id: 3, title: "Men's Graphic Tee", price: 32, category: "tshirts", desc: "Bold everyday graphic tee made from mid-weight cotton jersey.", image: "https://images.unsplash.com/photo-1503341504253-dff4815485f1?auto=format&fit=crop&w=700&q=80" },
+  { id: 4, title: "Women's Ribbed Tank Tee", price: 24, category: "tshirts", desc: "A ribbed tank tee that layers easily and moves with you.", image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=700&q=80" },
 
-  // SHOES
-  if (
-    text.includes("shoe") ||
-    text.includes("sneaker") ||
-    text.includes("boot") ||
-    text.includes("loafer") ||
-    text.includes("heel")
-  ) {
-    return "shoes";
-  }
+  // HOODIES
+  { id: 5, title: "Men's Essential Hoodie", price: 52, category: "hoodies", desc: "A brushed fleece hoodie built for cool mornings and travel days.", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=700&q=80" },
+  { id: 6, title: "Women's Oversized Hoodie", price: 55, category: "hoodies", desc: "An oversized hoodie with a soft fleece lining and relaxed silhouette.", image: "https://images.unsplash.com/photo-1509942774463-acf339cf87d5?auto=format&fit=crop&w=700&q=80" },
+  { id: 7, title: "Men's Zip-Up Hoodie", price: 58, category: "hoodies", desc: "A versatile zip-up hoodie that layers cleanly under any jacket.", image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=700&q=80" },
+  { id: 8, title: "Women's Cropped Hoodie", price: 48, category: "hoodies", desc: "A cropped hoodie with a soft, cozy fit for casual city days.", image: "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=700&q=80" },
+
+  // JACKETS
+  { id: 9, title: "Men's Denim Jacket", price: 78, category: "jackets", desc: "A classic denim jacket with a timeless fit and durable stitching.", image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=700&q=80" },
+  { id: 10, title: "Women's Trench Coat", price: 96, category: "jackets", desc: "A tailored trench coat that layers beautifully over any outfit.", image: "https://images.unsplash.com/photo-1520975954732-35dd22299614?auto=format&fit=crop&w=700&q=80" },
+  { id: 11, title: "Men's Bomber Jacket", price: 84, category: "jackets", desc: "A lightweight bomber jacket built for travel and everyday layering.", image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=700&q=80" },
+  { id: 12, title: "Women's Puffer Jacket", price: 88, category: "jackets", desc: "A quilted puffer jacket that keeps you warm without weighing you down.", image: "https://images.unsplash.com/photo-1544923246-77307dd654cb?auto=format&fit=crop&w=700&q=80" },
+
+  // JEANS
+  { id: 13, title: "Men's Slim Fit Jeans", price: 62, category: "jeans", desc: "Stretch denim jeans with a modern slim fit and clean finish.", image: "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=700&q=80" },
+  { id: 14, title: "Women's High-Waist Jeans", price: 64, category: "jeans", desc: "High-waist jeans with a flattering fit and comfortable stretch.", image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=700&q=80" },
+  { id: 15, title: "Men's Straight Leg Jeans", price: 60, category: "jeans", desc: "A straight leg cut in durable denim for everyday versatility.", image: "https://images.unsplash.com/photo-1475178626620-a4d074967452?auto=format&fit=crop&w=700&q=80" },
+  { id: 16, title: "Women's Skinny Jeans", price: 58, category: "jeans", desc: "Skinny jeans with just the right stretch for all-day movement.", image: "https://images.unsplash.com/photo-1475178626620-a4d074967452?auto=format&fit=crop&w=700&q=80" },
+
+  // DRESSES
+  { id: 17, title: "Women's Midi Wrap Dress", price: 68, category: "dresses", desc: "A flattering wrap dress in lightweight fabric for warm-weather travel.", image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=700&q=80" },
+  { id: 18, title: "Women's Summer Floral Dress", price: 54, category: "dresses", desc: "A breezy floral dress made for sunny days and city strolls.", image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=700&q=80" },
+  { id: 19, title: "Women's Evening Dress", price: 89, category: "dresses", desc: "An elegant evening dress with a refined, modern silhouette.", image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=700&q=80" },
+  { id: 20, title: "Women's Casual Shirt Dress", price: 49, category: "dresses", desc: "A relaxed shirt dress that transitions easily from day to night.", image: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=700&q=80" },
 
   // ACCESSORIES
-  if (
-    text.includes("bag") ||
-    text.includes("watch") ||
-    text.includes("belt") ||
-    text.includes("cap") ||
-    text.includes("hat") ||
-    text.includes("wallet") ||
-    text.includes("accessor") ||
-    text.includes("backpack")
-  ) {
-    return "accessories";
-  }
+  { id: 21, title: "Leather Travel Backpack", price: 72, category: "accessories", desc: "A durable leather-accented backpack sized for daily travel essentials.", image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=700&q=80" },
+  { id: 22, title: "Classic Aviator Sunglasses", price: 34, category: "accessories", desc: "Timeless aviator sunglasses with UV-protective lenses.", image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=700&q=80" },
+  { id: 23, title: "Minimalist Wrist Watch", price: 65, category: "accessories", desc: "A clean, minimalist watch designed to pair with any outfit.", image: "https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=700&q=80" },
+  { id: 24, title: "Woven Leather Belt", price: 29, category: "accessories", desc: "A woven leather belt built for durability and everyday style.", image: "https://images.unsplash.com/photo-1611085583191-a3b181a88401?auto=format&fit=crop&w=700&q=80" },
 
-  // WOMEN
-  if (
-    text.includes("dress") ||
-    text.includes("skirt") ||
-    text.includes("blouse") ||
-    text.includes("women") ||
-    text.includes("female") ||
-    text.includes("handbag")
-  ) {
-    return "women";
-  }
+  // SHOES (kept minimal — clothing is the focus)
+  { id: 25, title: "Men's Canvas Sneakers", price: 68, category: "shoes", desc: "Lightweight canvas sneakers built for everyday movement.", image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=700&q=80" },
+  { id: 26, title: "Women's Minimalist Trainers", price: 74, category: "shoes", desc: "Clean, minimalist trainers with a cushioned, all-day comfortable sole.", image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=700&q=80" }
+];
 
-  // MEN
-  if (
-    text.includes("shirt") ||
-    text.includes("jacket") ||
-    text.includes("hoodie") ||
-    text.includes("polo") ||
-    text.includes("men") ||
-    text.includes("male") ||
-    text.includes("pant") ||
-    text.includes("jean") ||
-    text.includes("trouser")
-  ) {
-    return "men";
-  }
+/* =========================
+   BUILD CATALOG
+   Adds computed fields (rating, sale, new, bestseller) to
+   each raw product so the rest of the app works exactly
+   as it did with the original API-driven data.
+========================= */
+function buildProduct(raw) {
+  const base = {
+    id: raw.id,
+    title: raw.title,
+    price: raw.price,
+    description: raw.desc,
+    image: raw.image,
+    category: raw.category,
+    originalCategory: categoryLabel(raw.category)
+  };
 
-  // FALLBACK FROM API CATEGORY
-  if (originalCategory.includes("shoe")) return "shoes";
-  if (originalCategory.includes("misc")) return "accessories";
-  if (originalCategory.includes("clothes")) return "men";
-
-  return "men";
-}
-
-function normalizeProduct(product) {
   return {
-    id: product.id,
-    title: product.title,
-    price: Number(product.price) || 0,
-    description: product.description || "No description available.",
-    image:
-      Array.isArray(product.images) && product.images.length
-        ? product.images[0]
-        : "https://via.placeholder.com/400x500?text=Nomad+Fits",
-    category: getMappedCategory(product),
-    originalCategory: product.category?.name || "Unknown",
-    rating: getRating(product),
-    isSale: isSale(product),
-    isNew: product.id % 3 === 0,
-    isBestSeller: product.id % 5 === 0
+    ...base,
+    rating: getRating(base),
+    isSale: isSale(base),
+    isNew: base.id % 3 === 0,
+    isBestSeller: base.id % 5 === 0
   };
 }
 
 /* =========================
-   FETCH PRODUCTS
+   LOAD PRODUCTS
 ========================= */
-async function fetchProducts() {
-  try {
-    const response = await fetch(API_URL);
-    const data = await response.json();
+function loadProducts() {
+  allProducts = RAW_PRODUCTS.map(buildProduct);
+  filteredProducts = [...allProducts];
 
-    const fashionProducts = data
-      .filter((item) => {
-        const cat = item.category?.name?.toLowerCase() || "";
-        return (
-          cat.includes("clothes") ||
-          cat.includes("shoes") ||
-          cat.includes("misc")
-        );
-      })
-      .slice(0, 28)
-      .map(normalizeProduct);
-
-    allProducts = fashionProducts;
-    filteredProducts = [...allProducts];
-
-    renderTrendingProducts();
-    renderProducts();
-  } catch (error) {
-    console.error("Error fetching products:", error);
-
-    allProducts = [
-      {
-        id: 1001,
-        title: "Men's Travel Shirt",
-        price: 45,
-        description: "Breathable shirt for daily wear and travel comfort.",
-        image: "https://via.placeholder.com/400x500?text=Mens+Shirt",
-        category: "men",
-        originalCategory: "Clothes",
-        rating: "4.5",
-        isSale: true,
-        isNew: true,
-        isBestSeller: false
-      },
-      {
-        id: 1002,
-        title: "Women's Urban Dress",
-        price: 58,
-        description: "A modern lightweight dress with comfort and style.",
-        image: "https://via.placeholder.com/400x500?text=Womens+Dress",
-        category: "women",
-        originalCategory: "Clothes",
-        rating: "4.7",
-        isSale: false,
-        isNew: true,
-        isBestSeller: true
-      },
-      {
-        id: 1003,
-        title: "Leather Sneakers",
-        price: 92,
-        description: "Modern sneakers for everyday movement and travel.",
-        image: "https://via.placeholder.com/400x500?text=Sneakers",
-        category: "shoes",
-        originalCategory: "Shoes",
-        rating: "4.8",
-        isSale: true,
-        isNew: false,
-        isBestSeller: true
-      },
-      {
-        id: 1004,
-        title: "Travel Backpack",
-        price: 40,
-        description: "Compact and stylish backpack for daily essentials.",
-        image: "https://via.placeholder.com/400x500?text=Backpack",
-        category: "accessories",
-        originalCategory: "Accessories",
-        rating: "4.4",
-        isSale: false,
-        isNew: false,
-        isBestSeller: false
-      }
-    ];
-
-    filteredProducts = [...allProducts];
-    renderTrendingProducts();
-    renderProducts();
-    showToast("Live API unavailable. Showing demo products.");
-  }
+  renderTrendingProducts();
+  renderProducts();
 }
 
 /* =========================
@@ -302,14 +232,23 @@ function renderTrendingProducts() {
     .map(
       (product) => `
       <div class="product-card">
-        ${product.isSale ? `<span class="sale-badge">SALE</span>` : ""}
+        <div class="card-badges">
+          ${product.isSale ? `<span class="badge sale-badge">SALE</span>` : ""}
+          ${product.isNew ? `<span class="badge new-badge">NEW</span>` : ""}
+        </div>
         <div class="product-image-wrap">
-          <img src="${product.image}" alt="${product.title}" class="product-image" />
+          <img
+            src="${product.image}"
+            alt="${product.title}"
+            class="product-image"
+            loading="lazy"
+            onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}';"
+          />
           <span class="quick-preview">Quick Preview</span>
         </div>
         <div class="product-info">
+          <p class="product-meta">${categoryLabel(product.category)}</p>
           <h3>${product.title}</h3>
-          <p class="product-meta">${capitalize(product.category)}</p>
           <div class="product-price">
             $${product.price.toFixed(2)}
             ${product.isSale ? `<span class="old-price">$${getOldPrice(product)}</span>` : ""}
@@ -336,13 +275,23 @@ function renderTrendingProducts() {
 }
 
 /* =========================
-   FILTER + SORT
+   FILTER + SORT + SEARCH
 ========================= */
 function applyFiltersAndSort() {
   let results = [...allProducts];
 
   if (selectedCategory !== "all") {
     results = results.filter((product) => product.category === selectedCategory);
+  }
+
+  if (searchTerm.trim() !== "") {
+    const term = searchTerm.trim().toLowerCase();
+    results = results.filter(
+      (product) =>
+        product.title.toLowerCase().includes(term) ||
+        product.category.toLowerCase().includes(term) ||
+        product.description.toLowerCase().includes(term)
+    );
   }
 
   if (selectedSort === "price-low") {
@@ -373,6 +322,17 @@ sortSelect.addEventListener("change", (e) => {
   applyFiltersAndSort();
 });
 
+/* Live search: filters products as the user types, with a
+   short debounce so it doesn't re-render on every keystroke. */
+let searchDebounce;
+searchInput.addEventListener("input", (e) => {
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(() => {
+    searchTerm = e.target.value;
+    applyFiltersAndSort();
+  }, 200);
+});
+
 /* =========================
    RENDER PRODUCTS
 ========================= */
@@ -380,7 +340,7 @@ function renderProducts() {
   productCount.textContent = filteredProducts.length;
 
   if (!filteredProducts.length) {
-    productsGrid.innerHTML = `<p>No products found for this category.</p>`;
+    productsGrid.innerHTML = `<p class="empty-state">No products found. Try a different filter or search term.</p>`;
     return;
   }
 
@@ -388,14 +348,23 @@ function renderProducts() {
     .map(
       (product) => `
       <div class="product-card">
-        ${product.isSale ? `<span class="sale-badge">SALE</span>` : ""}
+        <div class="card-badges">
+          ${product.isSale ? `<span class="badge sale-badge">SALE</span>` : ""}
+          ${product.isNew ? `<span class="badge new-badge">NEW</span>` : ""}
+        </div>
         <div class="product-image-wrap">
-          <img src="${product.image}" alt="${product.title}" class="product-image" />
+          <img
+            src="${product.image}"
+            alt="${product.title}"
+            class="product-image"
+            loading="lazy"
+            onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}';"
+          />
           <span class="quick-preview">Quick Preview</span>
         </div>
         <div class="product-info">
+          <p class="product-meta">${categoryLabel(product.category)}</p>
           <h3>${product.title}</h3>
-          <p class="product-meta">${capitalize(product.category)}</p>
           <div class="product-price">
             $${product.price.toFixed(2)}
             ${product.isSale ? `<span class="old-price">$${getOldPrice(product)}</span>` : ""}
@@ -444,12 +413,16 @@ function openProductModal(productId) {
 
   modalBody.innerHTML = `
     <div class="modal-gallery">
-      <img src="${product.image}" alt="${product.title}" />
+      <img
+        src="${product.image}"
+        alt="${product.title}"
+        onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}';"
+      />
     </div>
 
     <div class="modal-info">
       <h2>${product.title}</h2>
-      <p class="modal-category">${capitalize(product.category)} • ${product.originalCategory}</p>
+      <p class="modal-category">${categoryLabel(product.category)}</p>
 
       <div class="rating">
         ${"★".repeat(Math.round(product.rating))}
@@ -588,7 +561,11 @@ function renderCart() {
       .map(
         (item) => `
         <div class="cart-item">
-          <img src="${item.image}" alt="${item.title}" />
+          <img
+            src="${item.image}"
+            alt="${item.title}"
+            onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}';"
+          />
           <div>
             <h4>${item.title}</h4>
             <p>$${item.price.toFixed(2)} × ${item.quantity}</p>
@@ -710,4 +687,4 @@ contactForm.addEventListener("submit", (e) => {
    INIT
 ========================= */
 renderCart();
-fetchProducts();
+loadProducts();
