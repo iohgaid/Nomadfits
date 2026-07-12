@@ -45,6 +45,21 @@
           <a href="#shop" class="btn primary-btn">Shop Now</a>
           <a href="#collections" class="btn secondary-btn dark-btn">Explore Collections</a>
         </div>
+
+        <div class="hero-badges">
+          <div class="hero-badge">
+            <strong>Free Shipping</strong>
+            <span>On orders over $75</span>
+          </div>
+          <div class="hero-badge">
+            <strong>Easy Returns</strong>
+            <span>30-day return window</span>
+          </div>
+          <div class="hero-badge">
+            <strong>New Season</strong>
+            <span>Fresh drops weekly</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -75,21 +90,31 @@
       <div class="controls">
         <div class="filters">
           <button class="filter-btn active" data-category="all">All</button>
-          <button class="filter-btn" data-category="men">Men</button>
-          <button class="filter-btn" data-category="women">Women</button>
-          <button class="filter-btn" data-category="shoes">Shoes</button>
+          <button class="filter-btn" data-category="tshirts">T-Shirts</button>
+          <button class="filter-btn" data-category="hoodies">Hoodies</button>
+          <button class="filter-btn" data-category="jackets">Jackets</button>
+          <button class="filter-btn" data-category="jeans">Jeans</button>
+          <button class="filter-btn" data-category="dresses">Dresses</button>
           <button class="filter-btn" data-category="accessories">Accessories</button>
+          <button class="filter-btn" data-category="shoes">Shoes</button>
         </div>
 
-        <div class="sort-box">
-          <label for="sortSelect">Sort By:</label>
-          <select id="sortSelect">
-            <option value="default">Default</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="new-arrivals">New Arrivals</option>
-            <option value="bestsellers">Best Sellers</option>
-          </select>
+        <div class="controls-right">
+          <div class="search-box">
+            <span class="search-icon">⌕</span>
+            <input type="text" id="searchInput" placeholder="Search products..." />
+          </div>
+
+          <div class="sort-box">
+            <label for="sortSelect">Sort By:</label>
+            <select id="sortSelect">
+              <option value="default">Default</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="new-arrivals">New Arrivals</option>
+              <option value="bestsellers">Best Sellers</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -255,7 +280,47 @@
 
   <!-- FOOTER -->
   <footer class="footer">
-    <div class="container">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <h3>Nomad Fits</h3>
+        <p>Modern fashion for every destination. Travel-ready style, everyday comfort.</p>
+        <div class="social-links footer-social">
+          <a href="#">Instagram</a>
+          <a href="#">TikTok</a>
+          <a href="#">Facebook</a>
+          <a href="#">Pinterest</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="#shop">T-Shirts</a></li>
+          <li><a href="#shop">Hoodies</a></li>
+          <li><a href="#shop">Jackets</a></li>
+          <li><a href="#shop">Dresses</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#about">About Us</a></li>
+          <li><a href="#collections">Trending</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Get In Touch</h4>
+        <ul>
+          <li>hello@nomadfits.com</li>
+          <li>+1 (555) 123-4567</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
       <p>© 2026 Nomad Fits. Designed for style, movement, and adventure.</p>
     </div>
   </footer>
