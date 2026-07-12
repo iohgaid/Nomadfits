@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nomad Fits</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="container nav">
+      <h1 class="logo">Nomad Fits</h1>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="#home">Home</a>
+        <a href="#collections">Trending</a>
+        <a href="#shop">Shop</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="cart-btn" id="cartBtn">
+          Cart (<span id="cartCount">0</span>)
+        </button>
+        <button class="menu-btn" id="menuBtn">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+      <div class="hero-text">
+        <p class="hero-subtitle">Modern fashion for every destination</p>
+        <h2>Wear the Journey. Live the Adventure.</h2>
+        <p>
+          Nomad Fits blends travel-ready comfort with refined style — from city
+          nights to mountain mornings. Explore fashion essentials for men,
+          women, shoes, and accessories in one modern shopping experience.
+        </p>
+        <div class="hero-buttons">
+          <a href="#shop" class="btn primary-btn">Shop Now</a>
+          <a href="#collections" class="btn secondary-btn dark-btn">Explore Collections</a>
+        </div>
+
+        <div class="hero-badges">
+          <div class="hero-badge">
+            <strong>Free Shipping</strong>
+            <span>On orders over $75</span>
+          </div>
+          <div class="hero-badge">
+            <strong>Easy Returns</strong>
+            <span>30-day return window</span>
+          </div>
+          <div class="hero-badge">
+            <strong>New Season</strong>
+            <span>Fresh drops weekly</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRENDING -->
+  <section class="trending-section" id="collections">
+    <div class="container">
+      <div class="section-heading">
+        <h2>Trending Products</h2>
+        <p>
+          Best-selling picks and new arrivals curated for style, comfort, and movement.
+        </p>
+      </div>
+      <div class="trending-grid" id="trendingGrid"></div>
+    </div>
+  </section>
+
+  <!-- SHOP -->
+  <section class="shop-section" id="shop">
+    <div class="container">
+      <div class="section-heading">
+        <h2>Shop Collection</h2>
+        <p>
+          Browse our collection of men’s wear, women’s wear, shoes, and accessories.
+        </p>
+      </div>
+
+      <div class="controls">
+        <div class="filters">
+          <button class="filter-btn active" data-category="all">All</button>
+          <button class="filter-btn" data-category="tshirts">T-Shirts</button>
+          <button class="filter-btn" data-category="hoodies">Hoodies</button>
+          <button class="filter-btn" data-category="jackets">Jackets</button>
+          <button class="filter-btn" data-category="jeans">Jeans</button>
+          <button class="filter-btn" data-category="dresses">Dresses</button>
+          <button class="filter-btn" data-category="accessories">Accessories</button>
+          <button class="filter-btn" data-category="shoes">Shoes</button>
+        </div>
+
+        <div class="controls-right">
+          <div class="search-box">
+            <span class="search-icon">⌕</span>
+            <input type="text" id="searchInput" placeholder="Search products..." />
+          </div>
+
+          <div class="sort-box">
+            <label for="sortSelect">Sort By:</label>
+            <select id="sortSelect">
+              <option value="default">Default</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="new-arrivals">New Arrivals</option>
+              <option value="bestsellers">Best Sellers</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <p class="product-count">Products Found: <span id="productCount">0</span></p>
+      <div class="products-grid" id="productsGrid"></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about-section" id="about">
+    <div class="container">
+      <div class="section-heading">
+        <h2>About Nomad Fits</h2>
+        <p>The story behind the brand and the team building it.</p>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-story">
+          <h3>Our Story</h3>
+          <p>
+            Nomad Fits was created for people who want fashion that moves with them.
+            We believe clothing should be stylish, comfortable, and adaptable —
+            whether you're exploring a new city, heading to class, or traveling light.
+          </p>
+          <p>
+            Our philosophy is simple: create modern looks inspired by travel, movement,
+            and confidence. We focus on clean design, practical pieces, and a premium
+            feel without losing comfort.
+          </p>
+        </div>
+
+        <div class="about-values">
+          <h3>Brand Philosophy</h3>
+          <ul>
+            <li>Travel-ready style with everyday comfort</li>
+            <li>Modern fashion for men and women</li>
+            <li>Function meets fashion for modern movement</li>
+            <li>Clean design with accessible premium aesthetics</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- TEAM -->
+      <div class="team-section">
+        <h3>Meet the Team</h3>
+        <div class="team-grid">
+          <div class="team-card">
+            <img src="https://plus.gabischool.com/assets/uploads/students/69eefaf810683.JPG" alt="Imran" />
+            <h4>Imran</h4>
+            <p>Project Lead / Frontend Integration</p>
+            <span>
+              Hero section, product rendering flow, API integration, sorting logic,
+              and combining the full project into one final version.
+            </span>
+          </div>
+
+          <div class="team-card">
+            <img src="https://plus.gabischool.com/assets/uploads/students/student_6a467244182e66.29299757.jpg" alt="Umayma" />
+            <h4>Umayma</h4>
+            <p>UI & Product Filtering</p>
+            <span>
+              Category filters, product count, shop layout, responsive product cards,
+              and improved browsing experience for users.
+            </span>
+          </div>
+
+          <div class="team-card">
+            <img src="https://plus.gabischool.com/assets/uploads/students/69f5665e05ee9.jpeg" alt="Farhiya" />
+            <h4>Farhiya</h4>
+            <p>Cart & Shopping Flow</p>
+            <span>
+              Cart sidebar, add/remove items, quantity controls, total calculation,
+              checkout flow, and localStorage cart persistence.
+            </span>
+          </div>
+
+          <div class="team-card">
+            <img src="https://plus.gabischool.com/assets/uploads/students/698393929f956.jpeg" alt="Maryama" />
+            <h4>Maryama</h4>
+            <p>Modal, Validation & Testing</p>
+            <span>
+              Product detail modal, reviews section, size selection, contact form validation,
+              and testing the final user interactions.
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact-section" id="contact">
+    <div class="container">
+      <div class="section-heading">
+        <h2>Contact Us</h2>
+        <p>Questions, feedback, or partnership ideas? Reach out to the Nomad Fits team.</p>
+      </div>
+
+      <div class="contact-grid">
+        <form class="contact-form" id="contactForm">
+          <div class="form-row">
+            <input type="text" id="name" placeholder="Your Name" />
+            <small class="error" id="nameError"></small>
+          </div>
+
+          <div class="form-row">
+            <input type="email" id="email" placeholder="Your Email" />
+            <small class="error" id="emailError"></small>
+          </div>
+
+          <div class="form-row">
+            <textarea id="message" rows="5" placeholder="Your Message"></textarea>
+            <small class="error" id="messageError"></small>
+          </div>
+
+          <button type="submit" class="btn primary-btn">Send Message</button>
+          <p class="success-msg" id="formSuccess"></p>
+        </form>
+
+        <div class="contact-info">
+          <h3>Connect With Us</h3>
+          <p>Email: hello@nomadfits.com</p>
+          <p>Phone: +1 (555) 123-4567</p>
+          <div class="social-links">
+            <a href="#">Instagram</a>
+            <a href="#">TikTok</a>
+            <a href="#">Facebook</a>
+            <a href="#">Pinterest</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CART SIDEBAR -->
+  <aside class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h3>Your Cart</h3>
+      <button class="close-btn" id="closeCartBtn">✕</button>
+    </div>
+
+    <div class="cart-items" id="cartItems"></div>
+
+    <div class="cart-footer">
+      <h4>Total: $<span id="cartTotal">0.00</span></h4>
+      <button class="btn primary-btn checkout-btn" id="checkoutBtn">Checkout</button>
+    </div>
+  </aside>
+
+  <!-- OVERLAY -->
+  <div class="overlay hidden" id="overlay"></div>
+
+  <!-- PRODUCT MODAL -->
+  <div class="modal hidden" id="productModal">
+    <div class="modal-content">
+      <button class="close-btn modal-close" id="closeModalBtn">✕</button>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">Added to cart successfully!</div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <h3>Nomad Fits</h3>
+        <p>Modern fashion for every destination. Travel-ready style, everyday comfort.</p>
+        <div class="social-links footer-social">
+          <a href="#">Instagram</a>
+          <a href="#">TikTok</a>
+          <a href="#">Facebook</a>
+          <a href="#">Pinterest</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="#shop">T-Shirts</a></li>
+          <li><a href="#shop">Hoodies</a></li>
+          <li><a href="#shop">Jackets</a></li>
+          <li><a href="#shop">Dresses</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#about">About Us</a></li>
+          <li><a href="#collections">Trending</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Get In Touch</h4>
+        <ul>
+          <li>hello@nomadfits.com</li>
+          <li>+1 (555) 123-4567</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 Nomad Fits. Designed for style, movement, and adventure.</p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
